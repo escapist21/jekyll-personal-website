@@ -1,0 +1,21 @@
+pages:
+  - name: Home
+    link: /
+  - name: About
+    link: /about.html
+  - name: Blog
+    link: /blog.html
+
+socialmedia:
+  - name: Linkedin
+    fa-icon: fab fa-linkedin
+    url: https://www.linkedin.com/in/sourav-adhikari-204224130/
+  - name: Github
+    fa-icon: fab fa-github
+    url: https://www.github.com/escapist21
+  - name: Twitter
+    fa-icon: fab fa-twitter
+    url: https://www.twitter.com/_sourav90_
+  - name: Email
+    fa-icon: fas fa-envelope
+    url: mailto:sourav90.adhikari@gmail.com

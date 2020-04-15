@@ -1,0 +1,20 @@
+<nav class="navbar is-fresh is-transparent no-shadow is-fixed-top" role="navigation" aria-label="main navigation">
+    <div class="container">
+        <div class="navbar-menu">
+            <div class="navbar-start">
+                {% for item in site.data.navigation.socialmedia %}
+                <a class="navbar-item" href="{{ item.url }}" target="_blank">
+                    <i class="{{ item.fa-icon }}"></i>
+                 </a>
+                {% endfor %}
+            </div>
+            <div class="navbar-end">
+                {% for item in site.data.navigation.pages %}
+                <a class="navbar-item" href="{{ item.link }}">
+                    {{ item.name }}
+                 </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</nav>
