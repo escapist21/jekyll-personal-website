@@ -8,14 +8,14 @@ pages:
 
 socialmedia:
   - name: Linkedin
-    fa-icon: fab fa-linkedin
+    fa-icon: fab fa-lg fa-linkedin
     url: https://www.linkedin.com/in/sourav-adhikari-204224130/
   - name: Github
-    fa-icon: fab fa-github
+    fa-icon: fab fa-lg fa-github
     url: https://www.github.com/escapist21
   - name: Twitter
-    fa-icon: fab fa-twitter
+    fa-icon: fab fa-lg fa-twitter
     url: https://www.twitter.com/_sourav90_
   - name: Email
-    fa-icon: fas fa-envelope
+    fa-icon: fas fa-lg fa-envelope
     url: mailto:sourav90.adhikari@gmail.com
