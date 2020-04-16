@@ -9,6 +9,13 @@
                 <h2 class="subtitle">
                     Personal website & blog
                 </h2>
+                {% for item in site.data.navigation.socialmedia %}
+                <a href="{{ item.url }}" target="_blank" class="is-hidden-desktop hero-links">
+                    <span class="icon">
+                        <i class="{{ item.fa-icon }}"></i>
+                    </span>
+                 </a>
+                {% endfor %}
               </div>
               <div class="column is-5 is-offset-1">
                 <figure id="hero-image" class="image">
