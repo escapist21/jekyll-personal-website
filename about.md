@@ -1,6 +1,6 @@
 ---
+title: About
 layout: single
-title: About 
 ---
 
 I am a Data Analyst with [Policy & Development Advisory Group (PDAG)](https://www.pdag.in) working in the area of public policy research, data driven decision making and political economy. 
