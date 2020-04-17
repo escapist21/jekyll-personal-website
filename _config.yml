@@ -11,3 +11,14 @@ kramdown:
   syntax_highlighter: rouge 
   syntax_highlighter_opts:
     css_class: 'highlight'
+
+params:
+  homepage:
+    title: Sourav Adhikari
+    subtitle: Personal website and blog
+    image: /assets/images/myAvatar_HB.png
+
+  pageNotFound:
+    title: This page does not exist
+    image: /assets/images/myAvatar_HB.png
+
