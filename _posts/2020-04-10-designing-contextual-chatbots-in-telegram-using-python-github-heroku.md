@@ -1,7 +1,10 @@
 ---
-layout: single
 title: Designing a contextual chatbot in Telegram using Python, Github & Heroku
-tags: chatbot, python
+date: 2020-04-10 00:00:00 Z
+tags:
+- chatbot,
+- python
+layout: single
 ---
 
 Telegram bots are third-party applications that run inside the application. Users can interact with bots by sending them messages, commands and inline requests. Contextual chatbots are a category bots that communicate only through inline requests. They are contextual since they maintain a context and the users can only navigate the pre-defined context. These are especially useful in providing customer service. In this post, we will look at how to design such bots in Telegram using Python.
