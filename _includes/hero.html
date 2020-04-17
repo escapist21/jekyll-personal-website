@@ -4,13 +4,13 @@
           <div class="columns is-vcentered">
               <div class="column is-5 is-offset-1">
                 <h1 class="title is-2">
-                    Sourav Adhikari
+                    {{ site.params.homepage.title }}
                 </h1>
                 <h2 class="subtitle is-4">
-                    Personal website & blog
+                    {{ site.params.homepage.subtitle }}
                 </h2>
                 {% for item in site.data.navigation.socialmedia %}
-                <a href="{{ item.url }}" target="_blank" class="hero-links">
+                <a href="{{ item.url }}" target="_blank" class="hero-links" alt="{{ item.name }}" >
                     <span class="icon is-medium">
                         <i class="{{ item.fa-icon }}"></i>
                     </span>
@@ -19,7 +19,7 @@
               </div>
               <div class="column is-5 is-offset-1">
                 <figure id="hero-image" class="image">
-                    <img src="assets/images/myAvatar_HB.png" alt="myself">
+                    <img src="{{ site.params.homepage.image }}" alt="myself">
                 </figure>
               </div>
           </div>
