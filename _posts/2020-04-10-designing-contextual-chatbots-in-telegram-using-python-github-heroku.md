@@ -1,6 +1,7 @@
 ---
 layout: single
-title: Designing a contextual chatbot in Telegram using Python, Github & Heroku
+title: Coding contextual Telegram chatbots with Python, Github & Heroku
+description: How to design contextual Telgram chatbots with python
 tags: [chatbot, python]
 ---
 
