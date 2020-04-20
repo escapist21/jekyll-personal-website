@@ -1,0 +1,2 @@
+I"<p>In this codethrough we will explore creating web maps in Python using the <em>Flask</em> web framework and the excellent <em>folium</em> library. To make it more interesting we will retrieve the data to be plotted from Google Sheets using the <em>gspread</em> library.</p>
+:ET

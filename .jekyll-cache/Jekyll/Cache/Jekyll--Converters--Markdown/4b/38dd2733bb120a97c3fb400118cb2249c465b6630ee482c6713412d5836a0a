@@ -1,0 +1,256 @@
+I"�Q<p>In this codethrough we will explore creating web maps in Python using the <em>Flask</em> web framework and the excellent <em>folium</em> library. To make it more interesting we will retrieve the data to be plotted from Google Sheets using the <em>gspread</em> library.</p>
+
+<h2 id="setting-up-the-virtual-environment-and-installing-necessary-packages">Setting up the virtual environment and installing necessary packages</h2>
+<ul>
+  <li>create a project folder : <code class="highlighter-rouge">mkdir flask_webmap</code></li>
+  <li><code class="highlighter-rouge">cd</code> into the folder and set up a virtual environment</li>
+  <li>we will be using the virtualenv as our choice of virtual environment tool. Create an environment named venv by running <code class="highlighter-rouge">virtualenv venv</code> inside your project directory</li>
+  <li>activate the environment by running <code class="highlighter-rouge">source venv/bin/activate</code></li>
+  <li>to install the required modules run <code class="highlighter-rouge">python -m pip install -U Flask folium gspread</code></li>
+</ul>
+
+<h2 id="registering-our-app-with-google-to-use-the-google-sheets-api">Registering our app with Google to use the Google Sheets API</h2>
+<p>To access data from Google sheets we need to register our app with the Google Sheets API. To do so follow these steps</p>
+
+<ul>
+  <li>Open this <a href="https://console.developers.google.com/">Google console link </a> from a web browser</li>
+  <li>From the Google console dasboard click on New Project link found at the top bar</li>
+  <li>Give your project a name and click on Create</li>
+  <li>Click on the <strong>Enable APIs and services</strong></li>
+  <li>From the new page that opens listing the various APIs available, select the Google Sheets API and enable it</li>
+  <li>Once the API is enabled click on the <strong>Create credentials</strong> alert that appears</li>
+  <li>Fill in the necessary details: Select <strong>Web server</strong> for the question <strong>Where will you be calling the API from?</strong></li>
+  <li>In the next section enter any name for the <strong>Service account</strong>. The role option could be left blank but select <strong>JSON</strong> as your key type and click on continue</li>
+  <li>A new json file with your credentials will get downloaded</li>
+  <li>Copy the json file to your project directory</li>
+</ul>
+
+<h2 id="setting-up-a-minimal-flask-app">Setting up a minimal Flask app</h2>
+<ul>
+  <li>Create a new Python file by running <code class="highlighter-rouge">touch app.py</code></li>
+  <li>open the python file in your editor of choice ans create a minimal Flask app</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+
+
+<span class="c1"># instantiate a new Flask app
+</span><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">hello_world</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s">"Hellow World"</span>
+		
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></div>
+<ul>
+  <li>in your terminal export the Flask app environment variable by running <code class="highlighter-rouge">export FLASK_APP=app</code></li>
+  <li>The default environment is also set to production. We will change this behaviour to development by running <code class="highlighter-rouge">FLASK_ENV=development flask run</code></li>
+  <li>Run <code class="highlighter-rouge">flask run</code> to start the app</li>
+  <li>The new app should now be available at <em>localhost:5000/</em></li>
+  <li>The page should print the “Hello World” message</li>
+</ul>
+
+<h2 id="creating-a-google-sheet-with-seed-data">Creating a Google sheet with seed data</h2>
+<ul>
+  <li>Create a new google sheet</li>
+  <li>For the purpose of this exercise a subset of the earthquake location data by USGS was saved in sheet. To view the original data visit this <a href="https://www.kaggle.com/usgs/earthquake-database#database.csv">link</a>. To download the google sheet click on this <a href="https://docs.google.com/spreadsheets/d/1x2bVUzH5cnzcDJXnleGteT5zCEytczDAghcRe0Z9WuU/edit?usp=sharing">link</a></li>
+</ul>
+
+<h2 id="accessing-the-google-sheet-data">Accessing the Google sheet data</h2>
+<p>To access this data using the gspread library</p>
+<ul>
+  <li>create new  python file: <code class="highlighter-rouge">touch read_sheet.py</code></li>
+  <li>And copy the following code</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">gspread</span>
+<span class="kn">from</span> <span class="nn">oauth2client.service_account</span> <span class="kn">import</span> <span class="n">ServiceAccountCredentials</span>
+
+<span class="c1"># defining globals
+</span><span class="n">scope</span> <span class="o">=</span> <span class="p">[</span><span class="s">'https://spreadsheets.google.com/feeds'</span><span class="p">,</span> <span class="s">'https://www.googleapis.com/auth/drive'</span><span class="p">]</span>
+<span class="n">creds</span> <span class="o">=</span> <span class="n">ServiceAccountCredentials</span><span class="p">.</span><span class="n">from_json_keyfile_name</span><span class="p">(</span><span class="s">'NAME-OF-JSON-FILE-WITH-CREDENTIALS'</span><span class="p">,</span> <span class="n">scope</span><span class="p">)</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">gspread</span><span class="p">.</span><span class="n">authorize</span><span class="p">(</span><span class="n">creds</span><span class="p">)</span>
+
+<span class="c1"># opening the google sheet
+</span><span class="n">sheet</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="n">open_by_url</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s">"URL-OF-THE-GOOGLE-SHEET-WITH-THE-SEED-DATA"</span><span class="p">)</span>
+
+<span class="c1"># accessing the specific worksheet by index 
+# if index is left blank the first sheet will be read
+</span><span class="n">worksheet</span> <span class="o">=</span> <span class="n">sheet</span><span class="p">.</span><span class="n">get_worksheet</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+
+<span class="c1"># defining a function to read all records from the worksheet
+</span><span class="k">def</span> <span class="nf">get_all_records</span><span class="p">(</span><span class="n">worksheet</span><span class="o">=</span><span class="n">worksheet</span><span class="p">):</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="n">worksheet</span><span class="p">.</span><span class="n">get_all_records</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">records</span>
+</code></pre></div></div>
+<h4 id="understanding-the-code">Understanding the code</h4>
+<ol>
+  <li>First we define the globals for authorization. Replace the ‘NAME-OF-JSON-FILE-WITH-CREDENTIALS’  with the name of the json file downloaded Google API console.</li>
+  <li>Then we open the google sheet in which the data is stored using its URL</li>
+  <li>next we get the specific woksheet in which the data is stored using its index location. The first sheet is indexed ‘0’</li>
+  <li>Lastly we define a new function which gets all the records from that specific worksheet and returns it</li>
+</ol>
+
+<h2 id="testing-the-google-sheet-access">Testing the Google Sheet access</h2>
+<ul>
+  <li>Re-open the <em>app.py</em> file and edit the code</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">render_template</span><span class="p">,</span> <span class="n">jsonify</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="kn">from</span> <span class="nn">read_sheet</span> <span class="kn">import</span> <span class="n">get_all_records</span>
+
+<span class="c1"># instantiate a new Flash app
+</span><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">earthquake_data</span><span class="p">():</span>
+    <span class="c1"># storing all data in a variable records
+</span>    <span class="n">earthquakes</span> <span class="o">=</span> <span class="n">get_all_records</span><span class="p">()</span>
+    <span class="c1"># creating empty list
+</span>    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># looping through the variable
+</span>    <span class="k">for</span> <span class="n">earthquake</span> <span class="ow">in</span> <span class="n">earthquakes</span><span class="p">:</span>
+        <span class="c1"># appending to list
+</span>        <span class="n">data</span><span class="p">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s">"Latitude"</span><span class="p">:</span> <span class="n">earthquake</span><span class="p">[</span><span class="s">'Latitude'</span><span class="p">],</span>
+                <span class="s">"Longitude"</span><span class="p">:</span> <span class="n">earthquake</span><span class="p">[</span><span class="s">'Longitude'</span><span class="p">],</span>
+                <span class="s">"Magnitude"</span><span class="p">:</span> <span class="n">earthquake</span><span class="p">[</span><span class="s">'Magnitude'</span><span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="c1"># returning the list in json format
+</span>    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></div>
+
+<ul>
+  <li><code class="highlighter-rouge">flask run</code> from your terminal</li>
+  <li><em>localhost:5000</em> should now return a json representation of the data</li>
+</ul>
+
+<p><img src="/assets/images/earthquake_json.png" alt="list of earthquakes" /></p>
+
+<h2 id="plotting-the-map">Plotting the map</h2>
+<p>Now that we have verified the access to the Google Sheets data, let us plot it on a map.</p>
+
+<ul>
+  <li><code class="highlighter-rouge">touch plot_map.py</code> from your terminal</li>
+  <li>open the <em>plot_map.py</em> file and copy the following code</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">folium</span>
+
+<span class="k">def</span> <span class="nf">basemap_layer</span><span class="p">():</span>
+    <span class="nb">map</span> <span class="o">=</span> <span class="n">folium</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="n">min_zoom</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">map</span>
+
+<span class="k">def</span> <span class="nf">earthquake_plot</span><span class="p">(</span><span class="nb">map</span><span class="p">,</span> <span class="n">earthquakes</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">earthquake</span> <span class="ow">in</span> <span class="n">earthquakes</span><span class="p">:</span>
+        <span class="n">folium</span><span class="p">.</span><span class="n">Marker</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="p">[</span><span class="n">earthquake</span><span class="p">[</span><span class="s">'Latitude'</span><span class="p">],</span>
+                                <span class="n">earthquake</span><span class="p">[</span><span class="s">'Longitude'</span><span class="p">]],</span>
+                        <span class="n">popup</span><span class="o">=</span><span class="n">folium</span><span class="p">.</span><span class="n">Popup</span><span class="p">(</span><span class="s">"&lt;b&gt;Magnitude: &lt;/b&gt;{}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">earthquake</span><span class="p">[</span><span class="s">'Magnitude'</span><span class="p">]))</span>
+                        <span class="p">).</span><span class="n">add_to</span><span class="p">(</span><span class="nb">map</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="understanding-the-code-1">Understanding the code</h4>
+<ol>
+  <li>first we define the basemap_layer function which plots a basic map using the <code class="highlighter-rouge">folium.Map()</code>. The map is set to use all default values except for the <strong>min_zoom</strong> attribute which is set to 2.</li>
+  <li>next we define a function to plot the earthquake locations using the <code class="highlighter-rouge">folium.Marker()</code>, and add it to the parent map generated in the previous step</li>
+</ol>
+
+<h2 id="rendering-the-map-from-the-flask-app">Rendering the map from the Flask app</h2>
+<p>Open the <code class="highlighter-rouge">app.py</code> file and add this code</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span><span class="p">,</span> <span class="n">render_template</span>
+<span class="kn">from</span> <span class="nn">read_sheet</span> <span class="kn">import</span> <span class="n">get_all_records</span>
+<span class="kn">from</span> <span class="nn">plot_map</span> <span class="kn">import</span> <span class="n">basemap_layer</span><span class="p">,</span> <span class="n">earthquake_plot</span>
+
+<span class="c1"># instantiate a new Flash app
+</span><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">earthquake_data</span><span class="p">():</span>
+    <span class="c1"># storing all data in a variable records
+</span>    <span class="n">earthquakes</span> <span class="o">=</span> <span class="n">get_all_records</span><span class="p">()</span>
+   
+	  <span class="c1"># creating the map by calling the basemap_layer function
+</span>	  <span class="nb">map</span> <span class="o">=</span> <span class="n">basemap_layer</span><span class="p">()</span>
+		
+		<span class="c1"># generating the earthquake locations and plotting it
+</span>		<span class="c1"># by calling the earthquake_plot function
+</span>    <span class="n">earthquake_plot</span><span class="p">(</span><span class="nb">map</span><span class="o">=</span><span class="nb">map</span><span class="p">,</span> <span class="n">earthquakes</span><span class="o">=</span><span class="n">earthquakes</span><span class="p">)</span>
+		
+		<span class="c1"># save the map in the templates folder
+</span>    <span class="nb">map</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="s">'templates/map.html'</span><span class="p">)</span>
+   
+	  <span class="c1"># render the index.html
+</span>    <span class="k">return</span> <span class="n">render_template</span><span class="p">(</span><span class="s">'index.html'</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">"__main__"</span><span class="p">:</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></div>
+
+<h4 id="understanding-the-code-2">Understanding the code</h4>
+<ol>
+  <li>from the previously created <em>plot_map.py</em> file we import the <strong>basemap_layer</strong> and <strong>earthquake_plot</strong> functions</li>
+  <li>inside the view, first we create the map by calling the <code class="highlighter-rouge">basemap_layer()</code> function</li>
+  <li>to the map generated in step 2 we add the location of the earthquake generated by calling the <code class="highlighter-rouge">earthquake_plot()</code> function. The map from step 2 and earthquakes data is supplied as arguments</li>
+  <li>the map is saved as <em>map.html</em> in the <em>templates</em> folder. Create the templates folder before hand</li>
+  <li>lastly, return the <em>index.html</em></li>
+</ol>
+
+<h2 id="creating-the-indexhtml-file">Creating the <em>index.html</em> file</h2>
+<ul>
+  <li><code class="highlighter-rouge">mkdir templates</code> and <code class="highlighter-rouge">touch templates/index.html</code></li>
+  <li>open the <em>index.html</em> and copy the following code</li>
+</ul>
+
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
+<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"UTF-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">name=</span><span class="s">"viewport"</span> <span class="na">content=</span><span class="s">"width=device-width, initial-scale=1.0"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Document<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+    {% include "map.html" %}
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+</code></pre></div></div>
+
+<h4 id="understanding-the-code-3">Understanding the code</h4>
+<ol>
+  <li>We create the <em>index.html</em> file within the <em>templates</em> folder</li>
+  <li>In the body of the html boilerplate we include the <em>map.html</em> generated from the flask view using the jinja templating</li>
+</ol>
+
+<p><img src="/assets/images/web_map.png" alt="'web_page_displaying_the_map'" /></p>
+<h2 id="how-does-this-map-help-in-plotting-crowdsourced-data">How does this map help in plotting crowdsourced data?</h2>
+<p>The interesting fact about this application is that since the mapping function is called from within the Flask view, the data is called everytime the web map is refreshed in the browser. Thus if a new record is added to the Google sheet, it is immediately rendered by the application.</p>
+
+<p>Additionally, no database needs to be setup and values could be validated by using the Google Sheets cell validation functionality itself. Contributors can also directly add new records by accessing only the worksheet in question.</p>
+
+<p>So let’s try out this functionality. We all know about the 2015 Nepal earthquake. Let’s update the data in the sheet.</p>
+
+<p>To find Nepal’s coordinates visit <a href="http://www.latlong.net">latlong.net</a> and type Nepal in the search box. Copy the Latitude and Longtidue values to the Google sheet. <a href="https://en.wikipedia.org/wiki/April_2015_Nepal_earthquake">Wikipedia</a> also suggests that the Magnitude of the earthquake was 7.8. Populate the <strong>Magnitude</strong> column with this value.</p>
+
+<p>Now return to the map view and refresh the page. You will find that a marker for the new location has been added to the map.</p>
+
+<p><img src="/assets/images/web_map_nepal.png" alt="'web_map_after_refresh'" /></p>
+:ET
