@@ -1,7 +1,6 @@
 ---
 title: Plotting crowdsourced data with Google Sheets and Folium
-description: How to create web maps with crowdsourced data using Flask and Google
-  sheets
+date: 2020-04-18 00:00:00 Z
 tags:
 - python
 - webmap
@@ -9,6 +8,8 @@ tags:
 - crowdsourced
 - flask
 - geopandas
+description: How to create web maps with crowdsourced data using Flask and Google
+  sheets
 layout: single
 ---
 
