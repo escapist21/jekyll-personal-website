@@ -1,25 +1,29 @@
 ---
-title: Plotting crowdsourced data with Google Sheets and Folium
-description: How to create web maps with crowdsourced data using Flask and Google
-  sheets
+title: Plotting Google Sheets data in Python with Folium
+description: Real-time plotting of Google sheet data on a web app with Flask
 tags:
 - python
 - webmap
 - sheets
-- crowdsourced
 - flask
 - geopandas
+- real-time
 layout: single
 ---
 
-In this codethrough we will explore creating web maps in Python using the _Flask_ web framework and the excellent _folium_ library. To make it more interesting we will retrieve the data to be plotted from Google Sheets using the _gspread_ library.
+In this code through we will try to emulate the workflow where volunteers across the world will be reporting earthquakes through a Google Sheet, and the data will be updated real-time on a web map.
 
+The web platform will be created using the Flask web framework for Python and the data will be plotted using the excellent Folium library, which is a python wrapper for Leaflet JS. The data will be retrieved from a Google sheet using the gspread library which is a python wrapper for Google sheets API.
+
+![World map of earthquakes (1900-2017)](/assets/images/Map_of_earthquakes_1900-.png)
+
+This code through should work fine with Linux and macOS systems. For users with Windows systems, only the commands being run in the terminal needs to be modified.
 ## Setting up the virtual environment and installing necessary packages
-* create a project folder : `mkdir flask_webmap`
+* Create a project folder : `mkdir flask_webmap`
 * `cd` into the folder and set up a virtual environment
 *  we will be using the virtualenv as our choice of virtual environment tool. Create an environment named venv by running `virtualenv venv` inside your project directory
-*  activate the environment by running `source venv/bin/activate`
-*  to install the required modules run `python -m pip install -U Flask folium gspread`
+*  Activate the environment by running `source venv/bin/activate`
+*  Install the required modules by runing `python -m pip install -U Flask folium gspread`
 
 ## Registering our app with Google to use the Google Sheets API
 To access data from Google sheets we need to register our app with the Google Sheets API. To do so follow these steps
@@ -37,7 +41,7 @@ To access data from Google sheets we need to register our app with the Google Sh
 
 ## Setting up a minimal Flask app
 * Create a new Python file by running `touch app.py`
-* open the python file in your editor of choice ans create a minimal Flask app
+* Open the python file in your editor of choice ans create a minimal Flask app
 
 ```python
 from flask import Flask
@@ -95,7 +99,7 @@ def get_all_records(worksheet=worksheet):
     return records
 ```
 #### Understanding the code
-1. First we define the globals for authorization. Replace the 'NAME-OF-JSON-FILE-WITH-CREDENTIALS'  with the name of the json file downloaded Google API console. 
+1. First we define the globals for authorization. Replace the 'NAME-OF-JSON-FILE-WITH-CREDENTIALS'  with the name of the JSON file downloaded Google API console. 
 2. Then we open the google sheet in which the data is stored using its URL
 3. next we get the specific woksheet in which the data is stored using its index location. The first sheet is indexed '0'
 4. Lastly we define a new function which gets all the records from that specific worksheet and returns it
@@ -147,7 +151,7 @@ if __name__ == "__main__":
 Now that we have verified the access to the Google Sheets data, let us plot it on a map. 
 
 * `touch plot_map.py` from your terminal
-* open the _plot_map.py_ file and copy the following code
+* Open the _plot_map.py_ file and copy the following code
 
 ```python
 import folium
@@ -166,8 +170,8 @@ def earthquake_plot(map, earthquakes):
 ```
 
 #### Understanding the code
-1. first we define the basemap_layer function which plots a basic map using the `folium.Map()`. The map is set to use all default values except for the **min_zoom** attribute which is set to 2.
-2. next we define a function to plot the earthquake locations using the `folium.Marker()`, and add it to the parent map generated in the previous step 
+1. First, we define the basemap_layer function which plots a basic map using the `folium.Map()`. The map is set to use all default values except for the **min_zoom** attribute which is set to 2.
+2. Next, we define a function to plot the earthquake locations using the `folium.Marker()`, and add it to the parent map generated in the previous step 
 
 ## Rendering the map from the Flask app
 Open the `app.py` file and add this code
@@ -205,11 +209,11 @@ if __name__ == "__main__":
 ```
 
 #### Understanding the code
-1. from the previously created _plot_map.py_ file we import the **basemap_layer** and **earthquake_plot** functions
-2. inside the view, first we create the map by calling the `basemap_layer()` function
-3. to the map generated in step 2 we add the location of the earthquake generated by calling the `earthquake_plot()` function. The map from step 2 and earthquakes data is supplied as arguments
-4. the map is saved as _map.html_ in the _templates_ folder. Create the templates folder before hand
-5. lastly, return the _index.html_
+1. From the previously created _plot_map.py_ file we import the **basemap_layer** and **earthquake_plot** functions
+2. Inside the view, first we create the map by calling the `basemap_layer()` function
+3. To the map generated in step 2 we add the location of the earthquake generated by calling the `earthquake_plot()` function. The map from step 2 and earthquakes data is supplied as arguments
+4. The map is saved as _map.html_ in the _templates_ folder. Create the templates folder before hand
+5. Lastly, return the _index.html_
 
 ## Creating the _index.html_ file
 * `mkdir templates` and `touch templates/index.html`
@@ -237,9 +241,7 @@ if __name__ == "__main__":
 
 !['web_page_displaying_the_map'](/assets/images/web_map.png)
 ## How does this map help in plotting crowdsourced data?
-The interesting fact about this application is that since the mapping function is called from within the Flask view, the data is called everytime the web map is refreshed in the browser. Thus if a new record is added to the Google sheet, it is immediately rendered by the application on page refresh.
-
-Additionally, no database needs to be setup and new records added could be validated by using the Google Sheets cell validation functionality itself. Contributors to project only need to access the specific Google Sheet.
+The interesting aspect of this application is, that since the mapping function is called from within the Flask view, API call to the data is made every time the web map is refreshed in the browser. Thus any new record added to the Google sheet is rendered real-time by the application on page refresh.
 
 So let's try out this functionality. We all know about the 2015 Nepal earthquake. Let's update the data in the sheet. 
 
@@ -248,5 +250,3 @@ To find Nepal's coordinates visit [latlong.net](http://www.latlong.net) and type
 Now return to the map view and refresh the page. You will find that a marker for the new location has been added to the map.
 
 !['web_map_after_refresh'](/assets/images/web_map_nepal.png)
-
-This codethrough focussed only on creating the map using data from Google Sheets, and lacks commonly found functionalities in other web maps. We will focus on that in another tutorial. Till then, Happy coding!

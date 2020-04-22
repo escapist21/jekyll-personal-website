@@ -1,12 +1,17 @@
-I"ªQ<p>In this codethrough we will explore creating web maps in Python using the <em>Flask</em> web framework and the excellent <em>folium</em> library. To make it more interesting we will retrieve the data to be plotted from Google Sheets using the <em>gspread</em> library.</p>
+I"”T<p>In this code through we will try to emulate the workflow where volunteers across the world will be reporting earthquakes through a Google Sheet, and the data will be updated real-time on a web map.</p>
 
+<p>The web platform will be created using the Flask web framework for Python and the data will be plotted using the excellent Folium library, which is a python wrapper for Leaflet JS. The data will be retrieved from a Google sheet using the gspread library which is a python wrapper for Google sheets API.</p>
+
+<p><img src="/assets/images/Map_of_earthquakes_1900-.png" alt="World map of earthquakes (1900-2017)" /></p>
+
+<p>This code through should work fine with Linux and macOS systems. For users with Windows systems, only the commands being run in the terminal needs to be modified.</p>
 <h2 id="setting-up-the-virtual-environment-and-installing-necessary-packages">Setting up the virtual environment and installing necessary packages</h2>
 <ul>
-  <li>create a project folder : <code class="highlighter-rouge">mkdir flask_webmap</code></li>
+  <li>Create a project folder : <code class="highlighter-rouge">mkdir flask_webmap</code></li>
   <li><code class="highlighter-rouge">cd</code> into the folder and set up a virtual environment</li>
   <li>we will be using the virtualenv as our choice of virtual environment tool. Create an environment named venv by running <code class="highlighter-rouge">virtualenv venv</code> inside your project directory</li>
-  <li>activate the environment by running <code class="highlighter-rouge">source venv/bin/activate</code></li>
-  <li>to install the required modules run <code class="highlighter-rouge">python -m pip install -U Flask folium gspread</code></li>
+  <li>Activate the environment by running <code class="highlighter-rouge">source venv/bin/activate</code></li>
+  <li>Install the required modules by runing <code class="highlighter-rouge">python -m pip install -U Flask folium gspread</code></li>
 </ul>
 
 <h2 id="registering-our-app-with-google-to-use-the-google-sheets-api">Registering our app with Google to use the Google Sheets API</h2>
@@ -242,9 +247,9 @@
 
 <p><img src="/assets/images/web_map.png" alt="'web_page_displaying_the_map'" /></p>
 <h2 id="how-does-this-map-help-in-plotting-crowdsourced-data">How does this map help in plotting crowdsourced data?</h2>
-<p>The interesting fact about this application is that since the mapping function is called from within the Flask view, the data is called everytime the web map is refreshed in the browser. Thus if a new record is added to the Google sheet, it is immediately rendered by the application.</p>
+<p>The interesting fact about this application is that since the mapping function is called from within the Flask view, the data is called everytime the web map is refreshed in the browser. Thus if a new record is added to the Google sheet, it is immediately rendered by the application on page refresh.</p>
 
-<p>Additionally, no database needs to be setup and values could be validated by using the Google Sheets cell validation functionality itself. Contributors can also directly add new records by accessing only the worksheet in question.</p>
+<p>Additionally, no database needs to be setup and new records added could be validated by using the Google Sheets cell validation functionality itself. Contributors to project only need to access the specific Google Sheet.</p>
 
 <p>So letâ€™s try out this functionality. We all know about the 2015 Nepal earthquake. Letâ€™s update the data in the sheet.</p>
 
@@ -253,4 +258,6 @@
 <p>Now return to the map view and refresh the page. You will find that a marker for the new location has been added to the map.</p>
 
 <p><img src="/assets/images/web_map_nepal.png" alt="'web_map_after_refresh'" /></p>
+
+<p>This codethrough focussed only on creating the map using data from Google Sheets, and lacks commonly found functionalities in other web maps. We will focus on that in another tutorial. Till then, Happy coding!</p>
 :ET
