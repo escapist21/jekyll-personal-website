@@ -1,6 +1,6 @@
 ---
 title: Plotting Google Sheets data in Python with Folium
-description: Real-time plotting of Google sheet data on a web app with Flask
+date: 2020-04-18 00:00:00 Z
 tags:
 - python
 - webmap
@@ -8,6 +8,7 @@ tags:
 - flask
 - geopandas
 - real-time
+description: Real-time plotting of Google sheet data on a web app with Flask
 layout: single
 ---
 
